@@ -1,0 +1,1052 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Quit Tobacco Tracker</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    body {
+      min-height: 100vh;
+      background: radial-gradient(circle at top left, #182b3a, #050814 55%, #020308);
+      color: #f7f9ff;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .app-shell {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 16px 12px 32px;
+    }
+
+    h1, h2, h3 {
+      font-weight: 650;
+      letter-spacing: 0.03em;
+    }
+
+    .card {
+      background: radial-gradient(circle at top left, rgba(33, 60, 85, 0.9), rgba(9, 20, 35, 0.98));
+      border-radius: 24px;
+      padding: 18px 18px 16px;
+      box-shadow:
+        0 18px 45px rgba(0, 0, 0, 0.8),
+        0 0 0 1px rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(255, 255, 255, 0.03);
+      backdrop-filter: blur(18px);
+    }
+
+    .app-header {
+      margin-bottom: 14px;
+    }
+
+    .app-title-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 6px;
+    }
+
+    .badge-day1 {
+      padding: 6px 12px;
+      border-radius: 999px;
+      font-size: 12px;
+      border: 1px solid rgba(76, 240, 143, 0.5);
+      background: linear-gradient(135deg, rgba(22, 92, 60, 0.9), rgba(12, 50, 33, 0.95));
+      color: #c9ffdd;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      white-space: nowrap;
+    }
+
+    .badge-day1 span {
+      font-size: 13px;
+    }
+
+    .app-subtitle {
+      font-size: 12px;
+      opacity: 0.74;
+    }
+
+    /* top nav tabs (screens) */
+    .top-nav {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 14px;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      padding: 6px 0 10px;
+      background: linear-gradient(to bottom, rgba(2, 5, 11, 0.95), rgba(2, 5, 11, 0.7), transparent);
+      backdrop-filter: blur(10px);
+    }
+
+    .tab-btn {
+      flex: 1;
+      font-size: 12px;
+      padding: 8px 4px;
+      border-radius: 999px;
+      border: 1px solid rgba(134, 179, 255, 0.25);
+      background: rgba(5, 15, 35, 0.85);
+      color: #dce7ff;
+      text-align: center;
+      cursor: pointer;
+      outline: none;
+      transition: all 0.18s ease;
+    }
+
+    .tab-btn.active {
+      background: linear-gradient(135deg, #2563eb, #22c55e);
+      color: #f9fbff;
+      border-color: transparent;
+      box-shadow: 0 8px 20px rgba(34, 197, 94, 0.5);
+    }
+
+    .tab-btn span {
+      font-size: 11px;
+      opacity: 0.85;
+      display: block;
+    }
+
+    /* screens */
+    .screen {
+      display: none;
+      animation: fadeIn 0.2s ease-out;
+    }
+
+    .screen.active-screen {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* stats grid */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .stats-label {
+      font-size: 11px;
+      opacity: 0.7;
+      margin-bottom: 4px;
+    }
+
+    .stats-value-main {
+      font-size: 26px;
+      font-weight: 650;
+      line-height: 1.1;
+    }
+
+    .stats-value-sub {
+      font-size: 14px;
+      opacity: 0.75;
+    }
+
+    .divider {
+      height: 1px;
+      margin: 10px 0;
+      background: linear-gradient(to right, transparent, rgba(255,255,255,0.1), transparent);
+    }
+
+    .section-title {
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: .08em;
+      opacity: 0.85;
+      margin-bottom: 6px;
+    }
+
+    .motivation-text {
+      font-size: 13px;
+      line-height: 1.4;
+      opacity: 0.92;
+      margin-bottom: 8px;
+    }
+
+    .chip-inline {
+      display: inline-flex;
+      padding: 4px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      font-size: 10px;
+      opacity: 0.80;
+      margin-top: 2px;
+    }
+
+    .btn-row {
+      display: flex;
+      gap: 10px;
+      margin-top: 8px;
+    }
+
+    .btn {
+      flex: 1;
+      border: none;
+      border-radius: 999px;
+      padding: 10px 14px;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      outline: none;
+      transition: transform 0.1s ease, box-shadow 0.1s ease, background 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      white-space: nowrap;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #22c55e, #16a34a);
+      color: #031507;
+      box-shadow: 0 12px 30px rgba(16, 185, 129, 0.5);
+    }
+
+    .btn-danger {
+      background: linear-gradient(135deg, #f97373, #ef4444);
+      color: #fff5f5;
+      box-shadow: 0 12px 26px rgba(248, 113, 113, 0.45);
+    }
+
+    .btn-ghost {
+      background: rgba(12, 23, 43, 0.9);
+      border: 1px solid rgba(148, 185, 255, 0.4);
+      color: #e5edff;
+    }
+
+    .btn:active {
+      transform: translateY(1px) scale(0.98);
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.8);
+    }
+
+    .field-label {
+      font-size: 12px;
+      opacity: 0.8;
+      margin-bottom: 4px;
+    }
+
+    .input {
+      width: 100%;
+      margin-bottom: 10px;
+      padding: 9px 11px;
+      border-radius: 12px;
+      border: 1px solid rgba(148, 163, 184, 0.4);
+      background: rgba(15, 23, 42, 0.9);
+      color: #e5edff;
+      font-size: 13px;
+      outline: none;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+    }
+
+    .input::placeholder {
+      color: rgba(148, 163, 184, 0.7);
+    }
+
+    .input:focus {
+      border-color: #38bdf8;
+      background: rgba(15, 23, 42, 1);
+      box-shadow: 0 0 0 1px rgba(56, 189, 248, 0.5);
+    }
+
+    .pill-info {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.6);
+      margin-top: 4px;
+      opacity: 0.88;
+    }
+
+    .small-note {
+      font-size: 10px;
+      opacity: 0.72;
+      margin-top: 6px;
+    }
+
+    /* health timeline */
+    .timeline {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 4px;
+    }
+
+    .timeline-item {
+      border-radius: 18px;
+      padding: 10px 12px;
+      background: radial-gradient(circle at top left, rgba(37, 99, 235, 0.18), rgba(15, 23, 42, 0.96));
+      border: 1px solid rgba(59, 130, 246, 0.35);
+    }
+
+    .timeline-time {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      opacity: 0.8;
+      margin-bottom: 4px;
+      color: #bfdbfe;
+    }
+
+    .timeline-text {
+      font-size: 13px;
+      opacity: 0.95;
+      line-height: 1.4;
+    }
+
+    /* stats screen */
+    .stats-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: 6px;
+      font-size: 13px;
+    }
+
+    .stats-row {
+      display: flex;
+      justify-content: space-between;
+      opacity: 0.9;
+    }
+
+    .tag-soft {
+      display: inline-flex;
+      align-items: center;
+      padding: 3px 8px;
+      border-radius: 999px;
+      background: rgba(15, 23, 42, 0.9);
+      border: 1px solid rgba(148, 163, 184, 0.6);
+      font-size: 10px;
+      opacity: 0.9;
+    }
+
+    /* motivation library */
+    .quote-box {
+      margin-top: 8px;
+      padding: 10px 12px;
+      border-radius: 16px;
+      background: rgba(15, 23, 42, 0.96);
+      border: 1px solid rgba(148, 163, 184, 0.6);
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .quote-source {
+      font-size: 11px;
+      opacity: 0.75;
+      margin-top: 6px;
+    }
+
+    footer {
+      margin-top: 18px;
+      font-size: 10px;
+      opacity: 0.6;
+      text-align: center;
+    }
+
+    /* splash screen */
+    #splash {
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(circle at top, #1f2937, #020617 65%, #000);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      transition: opacity 0.35s ease;
+    }
+
+    #splash.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .splash-inner {
+      text-align: center;
+      padding: 32px 20px;
+      max-width: 360px;
+    }
+
+    .splash-title {
+      font-size: 26px;
+      line-height: 1.3;
+      font-weight: 700;
+      margin-bottom: 16px;
+    }
+
+    .splash-title span {
+      display: block;
+      font-size: 13px;
+      font-weight: 400;
+      opacity: 0.8;
+      margin-top: 4px;
+    }
+
+    .splash-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      border-radius: 999px;
+      border: 1px solid rgba(74, 222, 128, 0.65);
+      background: rgba(22, 163, 74, 0.25);
+      font-size: 11px;
+      margin-bottom: 18px;
+    }
+
+    @media (max-width: 640px) {
+      .app-shell {
+        padding-inline: 10px;
+      }
+
+      .card {
+        border-radius: 22px;
+        padding-inline: 14px;
+      }
+
+      .stats-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .splash-title {
+        font-size: 22px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Splash screen -->
+  <div id="splash">
+    <div class="splash-inner">
+      <div class="splash-pill">
+        🧠 Freedom mode • No excuses
+      </div>
+      <h1 class="splash-title">
+        Freedom from nicotine “disease”
+        <span>Every clean minute is a medicine for your body.</span>
+      </h1>
+      <button class="btn btn-primary" onclick="hideSplash()">
+        Enter tracker
+      </button>
+      <div class="small-note" style="margin-top:10px">
+        You are not weak. Nicotine is a drug. Aaj se aap quit leader ho.
+      </div>
+    </div>
+  </div>
+
+  <div class="app-shell">
+    <!-- Header -->
+    <header class="app-header">
+      <div class="app-title-row">
+        <div>
+          <h1 style="font-size:24px; line-height:1.1;">Quit Tobacco Tracker</h1>
+          <div class="app-subtitle">One clean minute → one clean life.</div>
+        </div>
+        <div class="badge-day1">
+          <span>Day&nbsp;1 भी जीत है</span> 💪
+        </div>
+      </div>
+    </header>
+
+    <!-- Top tabs -->
+    <nav class="top-nav">
+      <button class="tab-btn active" data-screen="dashboard">
+        Tracker
+        <span>Live streak</span>
+      </button>
+      <button class="tab-btn" data-screen="health">
+        Health
+        <span>Recovery</span>
+      </button>
+      <button class="tab-btn" data-screen="stats">
+        Stats
+        <span>Slips & wins</span>
+      </button>
+      <button class="tab-btn" data-screen="library">
+        Library
+        <span>Motivation</span>
+      </button>
+    </nav>
+
+    <main>
+      <!-- Screen 1: dashboard -->
+      <section id="screen-dashboard" class="screen active-screen">
+        <div class="card">
+          <div class="section-title">Current streak</div>
+          <div class="stats-grid">
+            <div>
+              <div class="stats-label">Days tobacco-free</div>
+              <div class="stats-value-main" id="daysValue">0</div>
+            </div>
+            <div>
+              <div class="stats-label">Hours</div>
+              <div class="stats-value-main" id="hoursValue">0</div>
+            </div>
+            <div>
+              <div class="stats-label">Minutes</div>
+              <div class="stats-value-main" id="minutesValue">0</div>
+            </div>
+            <div>
+              <div class="stats-label">Since</div>
+              <div class="stats-value-sub" id="sinceValue">Set your quit date</div>
+            </div>
+          </div>
+
+          <div class="divider"></div>
+
+          <div class="stats-grid">
+            <div>
+              <div class="stats-label">Money saved</div>
+              <div class="stats-value-sub" id="moneySaved">₹0</div>
+            </div>
+            <div>
+              <div class="stats-label">Cigs / packs avoided*</div>
+              <div class="stats-value-sub" id="unitsAvoided">0</div>
+            </div>
+            <div>
+              <div class="stats-label">Best streak</div>
+              <div class="stats-value-sub" id="bestStreak">0 d</div>
+            </div>
+            <div>
+              <div class="stats-label">Urges defeated</div>
+              <div class="stats-value-sub" id="urgesValue">0</div>
+            </div>
+          </div>
+
+          <div class="small-note">
+            *Gutkha / cigarette / any tobacco unit per day basis.
+          </div>
+        </div>
+
+        <div style="height:12px;"></div>
+
+        <div class="card">
+          <div class="section-title">Motivation</div>
+          <div id="motivationText" class="motivation-text">
+            Bas aaj ke liye quit. Kal ka kal dekhenge.
+          </div>
+          <div class="chip-inline">
+            Urges defeated: <span id="urgesChip">0</span> • Tap “New line” for another boost.
+          </div>
+
+          <div class="btn-row">
+            <button class="btn btn-ghost" id="btnNewLine">New line</button>
+            <button class="btn btn-primary" id="btnUrge">
+              + 1 urge defeated
+            </button>
+          </div>
+        </div>
+
+        <div style="height:12px;"></div>
+
+        <div class="card">
+          <div class="section-title">Your plan</div>
+          <label class="field-label" for="quitDateInput">Quit date &amp; time</label>
+          <input id="quitDateInput" type="datetime-local" class="input" />
+
+          <label class="field-label" for="spendInput">
+            Average spend per day on tobacco (₹)
+          </label>
+          <input id="spendInput" type="number" class="input" placeholder="e.g. 80" min="0" />
+
+          <label class="field-label" for="unitsInput">
+            Average units per day (gutkha / cig / pack)
+          </label>
+          <input id="unitsInput" type="number" class="input" placeholder="e.g. 10" min="0" />
+
+          <div class="btn-row">
+            <button class="btn btn-primary" id="btnSavePlan">
+              Save / Update plan
+            </button>
+            <button class="btn btn-danger" id="btnSlip">
+              I slipped today (reset)
+            </button>
+          </div>
+
+          <div class="pill-info">
+            ● Data auto-save hota hai (local device only)
+          </div>
+        </div>
+      </section>
+
+      <!-- Screen 2: health recovery -->
+      <section id="screen-health" class="screen">
+        <div class="card">
+          <div class="section-title">Health recovery timeline</div>
+          <div class="timeline">
+            <div class="timeline-item">
+              <div class="timeline-time">20 minutes</div>
+              <div class="timeline-text">
+                Heart rate aur blood pressure nicotine ke attack se normal ki taraf aane lagte hain.
+              </div>
+            </div>
+            <div class="timeline-item">
+              <div class="timeline-time">12 hours</div>
+              <div class="timeline-text">
+                Blood me carbon monoxide level normal hota hai. Har saans me zyada oxygen milti hai.
+              </div>
+            </div>
+            <div class="timeline-item">
+              <div class="timeline-time">2–12 weeks</div>
+              <div class="timeline-text">
+                Walking, सीढ़ी, दौड़ — sab asaan lagne lagta hai. Circulation aur lung function strong.
+              </div>
+            </div>
+            <div class="timeline-item">
+              <div class="timeline-time">3–9 months</div>
+              <div class="timeline-text">
+                Khansi, सांस फूलना, wheezing kam. Lung ki सफाई system (cilia) wapas full power pe.
+              </div>
+            </div>
+            <div class="timeline-item">
+              <div class="timeline-time">1 year</div>
+              <div class="timeline-text">
+                Heart attack ka risk almost आधा ho jata hai ek smoker ke comparison me.
+              </div>
+            </div>
+            <div class="timeline-item">
+              <div class="timeline-time">5–10 years</div>
+              <div class="timeline-text">
+                Stroke aur mouth / throat cancer ka risk bahut kam ho jata hai. Aapka शरीर aapko reward de raha hai.
+              </div>
+            </div>
+          </div>
+          <div class="small-note" style="margin-top:8px;">
+            Ye generic timeline hai. Har इंसान की health अलग hoti hai – doctor se regular check-up jaroor karein.
+          </div>
+        </div>
+
+        <div style="height:12px;"></div>
+
+        <div class="card">
+          <div class="section-title">Withdrawal &amp; urges toolkit</div>
+          <div class="timeline">
+            <div class="timeline-item">
+              <div class="timeline-time">2–5 minutes rule</div>
+              <div class="timeline-text">
+                Jab भी urge aaye, stopwatch lagao: sirf 2–5 minute survive karna hai. Har urge ek लहर ki tarah hota hai – aata hai, peak karta hai, fir चला jata hai.
+              </div>
+            </div>
+            <div class="timeline-item">
+              <div class="timeline-time">Replace ritual</div>
+              <div class="timeline-text">
+                Bike chalate waqt ya खाने के baad agar हमेशा gutkha tha, ab वही time ek नया ritual: पानी, च्युइंग gum, deep breathing, ya 20 squats.
+              </div>
+            </div>
+            <div class="timeline-item">
+              <div class="timeline-time">Emergency plan</div>
+              <div class="timeline-text">
+                3 चीज़ें हमेशा ready rakho: <br>
+                1) किसी का नाम jise call kar sakte ho,<br>
+                2) छोटी walk,<br>
+                3) ye app kholna aur “+1 urge defeated” दबाना.
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Screen 3: stats & slips -->
+      <section id="screen-stats" class="screen">
+        <div class="card">
+          <div class="section-title">Stats &amp; victories</div>
+          <div class="stats-list">
+            <div class="stats-row">
+              <span>Total urges defeated</span>
+              <span id="statsUrges">0</span>
+            </div>
+            <div class="stats-row">
+              <span>Total slips logged</span>
+              <span id="statsSlips">0</span>
+            </div>
+            <div class="stats-row">
+              <span>Longest streak (approx)</span>
+              <span id="statsBest">0 days</span>
+            </div>
+            <div class="stats-row">
+              <span>Last slip date</span>
+              <span id="statsLastSlip">—</span>
+            </div>
+          </div>
+
+          <div class="small-note" style="margin-top:10px;">
+            Slip = failure nahi. Slip = data. Ye data aapko batata hai ki अगली बार kaha सावधानी करनी hai.
+          </div>
+        </div>
+
+        <div style="height:12px;"></div>
+
+        <div class="card">
+          <div class="section-title">Money & time gain</div>
+          <div class="stats-list">
+            <div class="stats-row">
+              <span>Money saved till now</span>
+              <span id="statsMoney">₹0</span>
+            </div>
+            <div class="stats-row">
+              <span>Tobacco-free days</span>
+              <span id="statsDays">0</span>
+            </div>
+            <div class="stats-row">
+              <span>Units avoided (total)</span>
+              <span id="statsUnits">0</span>
+            </div>
+          </div>
+          <div class="small-note" style="margin-top:8px;">
+            सोचे: ye paisa aur time agar health, family aur सीखने pe lage toh 1 saal me aap kaha पहुंच सकते hain.
+          </div>
+        </div>
+      </section>
+
+      <!-- Screen 4: motivation library -->
+      <section id="screen-library" class="screen">
+        <div class="card">
+          <div class="section-title">Motivation library</div>
+          <p class="motivation-text">
+            Jab भी मन कमजोर पड़े, बस is स्क्रीन ko खोल लो aur “Next line” दबाते रहो. Kisi ek line se वो क्लिक aayega jisse aap फिर से strong feel करोगे.
+          </p>
+
+          <div class="quote-box">
+            <div id="libraryQuote">
+              Tobacco se door har din tumhara BP, heart, lungs ka shukriya bol raha hai.
+            </div>
+            <div class="quote-source" id="librarySource">
+              — Daily reminder
+            </div>
+          </div>
+
+          <div class="btn-row" style="margin-top:10px;">
+            <button class="btn btn-primary" id="btnNextLibrary">
+              Next line
+            </button>
+            <button class="btn btn-ghost" onclick="showScreen('dashboard')">
+              Back to tracker
+            </button>
+          </div>
+
+          <div class="small-note" style="margin-top:10px;">
+            Apni पसंद की line सोचे? Future version me hum “Add my own lines” feature bhi add kar sakte हैं.
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      This app is not medical advice. Doctor se consult jaroor karein – ye app aapka daily साथी hai.
+    </footer>
+  </div>
+
+  <script>
+    const STORAGE_KEY = "quit_tobacco_tracker_v2";
+
+    const elements = {
+      daysValue: document.getElementById("daysValue"),
+      hoursValue: document.getElementById("hoursValue"),
+      minutesValue: document.getElementById("minutesValue"),
+      sinceValue: document.getElementById("sinceValue"),
+      moneySaved: document.getElementById("moneySaved"),
+      unitsAvoided: document.getElementById("unitsAvoided"),
+      bestStreak: document.getElementById("bestStreak"),
+      urgesValue: document.getElementById("urgesValue"),
+      urgesChip: document.getElementById("urgesChip"),
+      motivationText: document.getElementById("motivationText"),
+
+      quitDateInput: document.getElementById("quitDateInput"),
+      spendInput: document.getElementById("spendInput"),
+      unitsInput: document.getElementById("unitsInput"),
+
+      statsUrges: document.getElementById("statsUrges"),
+      statsSlips: document.getElementById("statsSlips"),
+      statsBest: document.getElementById("statsBest"),
+      statsLastSlip: document.getElementById("statsLastSlip"),
+      statsMoney: document.getElementById("statsMoney"),
+      statsDays: document.getElementById("statsDays"),
+      statsUnits: document.getElementById("statsUnits"),
+
+      libraryQuote: document.getElementById("libraryQuote"),
+      librarySource: document.getElementById("librarySource")
+    };
+
+    let state = {
+      quitDateTime: null, // ISO string
+      spendPerDay: 0,
+      unitsPerDay: 0,
+      bestStreakHours: 0,
+      urgesDefeated: 0,
+      slips: [] // ISO dates
+    };
+
+    function loadState() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return;
+        const parsed = JSON.parse(raw);
+        state = Object.assign(state, parsed);
+      } catch (e) {
+        console.error("Failed to load state", e);
+      }
+    }
+
+    function saveState() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    }
+
+    function formatDateTime(dt) {
+      if (!dt) return "";
+      const d = new Date(dt);
+      if (isNaN(d.getTime())) return "";
+      const options = {
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit"
+      };
+      return d.toLocaleString(undefined, options);
+    }
+
+    function updateStats() {
+      if (!state.quitDateTime) {
+        elements.daysValue.textContent = "0";
+        elements.hoursValue.textContent = "0";
+        elements.minutesValue.textContent = "0";
+        elements.sinceValue.textContent = "Set your quit date";
+        elements.moneySaved.textContent = "₹0";
+        elements.unitsAvoided.textContent = "0";
+        elements.bestStreak.textContent = "0 d";
+        elements.urgesValue.textContent = state.urgesDefeated;
+        elements.urgesChip.textContent = state.urgesDefeated;
+
+        elements.statsUrges.textContent = state.urgesDefeated;
+        elements.statsSlips.textContent = state.slips.length;
+        elements.statsBest.textContent = "0 days";
+        elements.statsLastSlip.textContent = "—";
+        elements.statsMoney.textContent = "₹0";
+        elements.statsDays.textContent = "0";
+        elements.statsUnits.textContent = "0";
+        return;
+      }
+
+      const quitDate = new Date(state.quitDateTime);
+      let now = new Date();
+
+      let diffMs = now - quitDate;
+      if (diffMs < 0) diffMs = 0;
+
+      const totalMinutes = Math.floor(diffMs / 60000);
+      const totalHours = Math.floor(totalMinutes / 60);
+      const totalDays = Math.floor(totalMinutes / (60 * 24));
+
+      const days = totalDays;
+      const hours = Math.floor((totalMinutes % (60 * 24)) / 60);
+      const minutes = totalMinutes % 60;
+
+      elements.daysValue.textContent = days;
+      elements.hoursValue.textContent = hours;
+      elements.minutesValue.textContent = minutes;
+      elements.sinceValue.textContent = formatDateTime(state.quitDateTime) || "—";
+
+      const dayFraction = diffMs / (1000 * 60 * 60 * 24);
+      const moneySaved = state.spendPerDay * dayFraction;
+      const unitsAvoided = state.unitsPerDay * dayFraction;
+
+      elements.moneySaved.textContent = "₹" + Math.round(moneySaved);
+      elements.unitsAvoided.textContent = Math.round(unitsAvoided);
+      elements.urgesValue.textContent = state.urgesDefeated;
+      elements.urgesChip.textContent = state.urgesDefeated;
+
+      if (totalHours > state.bestStreakHours) {
+        state.bestStreakHours = totalHours;
+        saveState();
+      }
+
+      const bestDays = (state.bestStreakHours / 24).toFixed(1);
+      elements.bestStreak.textContent = bestDays + " d";
+
+      // stats screen
+      elements.statsUrges.textContent = state.urgesDefeated;
+      elements.statsSlips.textContent = state.slips.length;
+      elements.statsBest.textContent = bestDays + " days";
+      elements.statsLastSlip.textContent =
+        state.slips.length > 0
+          ? new Date(state.slips[state.slips.length - 1]).toLocaleDateString()
+          : "—";
+      elements.statsMoney.textContent = "₹" + Math.round(moneySaved);
+      elements.statsDays.textContent = days;
+      elements.statsUnits.textContent = Math.round(unitsAvoided);
+    }
+
+    function tick() {
+      updateStats();
+    }
+
+    // motivation lines
+    const motivationLines = [
+      "Tobacco se door har din tumhara BP, heart, lungs ka shukriya bol raha hai.",
+      "Tumhare bachche ko ek healthy hero chahiye – cigarette hero nahi.",
+      "Urge sirf 2–5 minute ka mehmaan hai. Tum ghar ke malik ho.",
+      "Aaj tumne jo nahi kharida – wahi paisa future me tumhari health policy banega.",
+      "Har clean दिन dimaag ki clarity + आत्म-respect ka बोनस hai.",
+      "Nicotine ek chemical hai, tumhari willpower usse कहीं ज़्यादा powerful hai.",
+      "Kal se nahi, अगला puff se pehle decision hota hai: मैं hero hoon ya prisoner?"
+    ];
+
+    const libraryLines = [
+      {
+        text: "Tumhare andar ka asli tum – nicotine ke बिना वाला version – bahut zyada शांत, clear aur powerful hai.",
+        source: "Inner voice"
+      },
+      {
+        text: "Jis दिन bhi slip ho, yaad rakhna: tum wapas zero pe nahi gire. Tumhara सीखना zero pe nahi jata.",
+        source: "Relapse is lesson, not failure"
+      },
+      {
+        text: "Gutkha se milne wala 5 minute का comfort, aage chal kar 5 saal का दर्द de sakta hai.",
+        source: "Health reality"
+      },
+      {
+        text: "हर बार jab tum urge ko 'ना' bolte ho, nicotine ki ताकत आधी ho jati hai.",
+        source: "Urge science"
+      },
+      {
+        text: "Nicotine chhodna मुश्किल lagta hai, par सैकड़ों करोड़ इंसान pehle hi छोड़ चुके hain.",
+        source: "Proof of possibility"
+      }
+    ];
+
+    function showRandomMotivation() {
+      const idx = Math.floor(Math.random() * motivationLines.length);
+      elements.motivationText.textContent = motivationLines[idx];
+    }
+
+    function showRandomLibraryLine() {
+      const idx = Math.floor(Math.random() * libraryLines.length);
+      const item = libraryLines[idx];
+      elements.libraryQuote.textContent = item.text;
+      elements.librarySource.textContent = "— " + item.source;
+    }
+
+    // event handlers
+    document.getElementById("btnNewLine").addEventListener("click", () => {
+      showRandomMotivation();
+    });
+
+    document.getElementById("btnUrge").addEventListener("click", () => {
+      state.urgesDefeated += 1;
+      saveState();
+      updateStats();
+      showRandomMotivation();
+    });
+
+    document.getElementById("btnSavePlan").addEventListener("click", () => {
+      const dtValue = elements.quitDateInput.value;
+      const spend = parseFloat(elements.spendInput.value) || 0;
+      const units = parseFloat(elements.unitsInput.value) || 0;
+
+      if (!dtValue) {
+        alert("Quit date & time select karein.");
+        return;
+      }
+
+      const iso = new Date(dtValue).toISOString();
+      state.quitDateTime = iso;
+      state.spendPerDay = spend;
+      state.unitsPerDay = units;
+      saveState();
+      updateStats();
+      alert("Plan saved ✅");
+    });
+
+    document.getElementById("btnSlip").addEventListener("click", () => {
+      if (!confirm("Kya aaj सच में slip hua? Yeh sirf data ke liye log hoga.")) {
+        return;
+      }
+
+      const now = new Date().toISOString();
+      state.slips.push(now);
+      // bestStreakHours ko touch nahi karte — wo सबसे लंबा streak hai
+      state.quitDateTime = new Date().toISOString();
+      saveState();
+      updateStats();
+      alert("Slip log ho gaya. Abhi se naya streak start. 💪");
+    });
+
+    document.getElementById("btnNextLibrary").addEventListener("click", () => {
+      showRandomLibraryLine();
+    });
+
+    // tab switching
+    const tabButtons = document.querySelectorAll(".tab-btn");
+    const screens = document.querySelectorAll(".screen");
+
+    function showScreen(name) {
+      screens.forEach((s) => {
+        if (s.id === "screen-" + name) {
+          s.classList.add("active-screen");
+        } else {
+          s.classList.remove("active-screen");
+        }
+      });
+      tabButtons.forEach((btn) => {
+        btn.classList.toggle("active", btn.dataset.screen === name);
+      });
+    }
+
+    tabButtons.forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const scr = btn.dataset.screen;
+        showScreen(scr);
+      });
+    });
+
+    // splash logic
+    function hideSplash() {
+      const s = document.getElementById("splash");
+      s.classList.add("hidden");
+    }
+    window.hideSplash = hideSplash;
+
+    window.addEventListener("load", () => {
+      loadState();
+
+      // restore inputs
+      if (state.quitDateTime) {
+        const d = new Date(state.quitDateTime);
+        const localISO = new Date(d.getTime() - d.getTimezoneOffset() * 60000)
+          .toISOString()
+          .slice(0, 16);
+        elements.quitDateInput.value = localISO;
+      }
+      elements.spendInput.value =
+        state.spendPerDay > 0 ? String(state.spendPerDay) : "";
+      elements.unitsInput.value =
+        state.unitsPerDay > 0 ? String(state.unitsPerDay) : "";
+
+      updateStats();
+      showRandomMotivation();
+      showRandomLibraryLine();
+
+      setInterval(tick, 60000); // har minute stats update
+      setTimeout(hideSplash, 2200); // 2.2 sec ke baad splash hide
+    });
+  </script>
+</body>
+</html>
