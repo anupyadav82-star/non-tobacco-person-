@@ -1,2 +1,2 @@
-# non-tobacco-person-
+# nontobacco person
 For quit tobacco use
